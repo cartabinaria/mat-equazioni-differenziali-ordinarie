@@ -1,0 +1,569 @@
+\documentclass[a4paper, parskip = half]{scrartcl}
+\usepackage{graphicx}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[bb=dsserif]{mathalpha}
+
+\usepackage[margin = 2cm]{geometry}
+\usepackage{enumitem}
+
+\usepackage{textcomp}
+\usepackage[italian]{babel}
+\usepackage{amsmath, amssymb}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\diff}{\mathrm{d}}
+
+\DeclareEmphSequence{\boldmath\slshape\bfseries}
+\newenvironment{example}{\itshape\small \setlist{itemsep=0pt, topsep=0pt, partopsep=0pt}}{}
+\setkomafont{author}{\Large\itshape}
+
+\usepackage[colorlinks=true, linkcolor = blue]{hyperref}
+
+\title{Il riassuntone localmente lipschitziano di \\ \textit{Equazioni differenziali ordinarie}}
+\subtitle{UniBo -- Prof. Abenda e Tesi}
+\author{Alessandro Cerati}
+\date{\textsc{a.a.} 2023/2024}
+
+\begin{document}
+\begin{titlepage}
+  \pagenumbering{gobble}
+  \maketitle
+  \begin{center}
+    \huge \sffamily \bfseries Accesso anticipato pre-preappello \\[20pt]
+
+    \includegraphics[width = .6\textwidth]{build/odecover.png}
+  \end{center}
+\end{titlepage}
+\pagenumbering{Roman}
+\tableofcontents
+\newpage
+\subsection*{Nota: scopo del \textit{Riassuntone}}
+Questo è un riassunto discorsivo del corso. Non ci sono dimostrazioni e ho intenzionalmente provato a usare meno notazione matematica possibile. Ho anche accorpato alcuni argomenti trattati in entrambi i moduli (ad esempio sistemi hamiltoniani e sistemi gradiente). Questo documento nasce come riassunto per chiarirsi le idee e i collegamenti tra concetti: non consiglio assolutamente di studiare solo da qui per l'esame, ma non penso che a nessuno verrebbe in mente. 
+
+Gli esempi sono scritti in corsivo, e sono soprattutto quelli del modulo di Tesi. Nessun esempio, comunque, è sviluppato. Nell'A.A. 23/24, in cui scrivo, la sezione \ref*{sec:solPer} non è argomento d'esame, essendo stata spiegata nell'ultima lezione.
+
+Un paio di \textit{disclaimer}:
+\begin{itemize}
+  \item Per i matematici: seguo il corso di fisica, quindi alcuni concetti potrebbero non essere precisissimi. Abbiate pazienza, gli autospazi generalizzati mi spaventano. \textit{Vvb}. 
+  \item Per tutti: nonostante io segua il corso di fisica, non ho (ancora) raggiunto l'onniscienza e questa prima versione uscirà prima che io abbia dato l'esame, quindi alcune cose non mi sono ancora chiare e potrebbero esserci errori. Probabilmente c'è anche qualche buon vecchio errore di battitura o distrazione. Il condizionale è usato nel senso che sicuramente gli errori ci sono, ma non so dove.
+\end{itemize}
+Per segnalazioni di errori o qualsiasi altra cosa scrivetemi pure su Telegram \texttt{@quoderitdemonstratum} o alla mail Unibo \href{mailto:alessandro.cerati@studio.unibo.it}{\texttt{alessandro.cerati@studio.unibo.it}}. \\[11pt]
+In bocca al lupo!
+
+\textit{Alessandro}
+
+\newpage
+
+\pagenumbering{arabic}
+\section{Teoria generale dei problemi di Cauchy}
+\subsection{Notazione e definizioni di base}
+Per tutto il corso consideriamo funzioni continue in spazio e tempo e localmente lipschitziane nello spazio, definite da aperti di $\mathbb{R} \times \mathbb{R}^{n}$ in aperti di $\mathbb{R}^{n}$. Quando definiscono un sistema, esse sono dette \emph{campo vettoriale} di quel sistema. Se prendiamo funzioni $\mathcal{C}^{(1)}$ queste saranno automaticamente localmente lipschitziane, per il teorema del valor medio.
+
+Consideriamo \emph{sistemi di equazioni differenziali}, scritti col formalismo dei vettori in $\R^{n}$, e \emph{problemi di Cauchy}, dati da un sistema con aggiunto un dato iniziale. Una \emph{soluzione di un sistema} è una funzione da un sottointervallo dell'intervallo temporale nell'aperto spaziale, con derivata uguale al campo vettoriale in $(t,\phi(t))$. La soluzione di un sistema è necessariamente $\mathcal{C}^{(1)}$. Una \emph{soluzione di un problema di Cauchy} è una soluzione del sistema associato che al tempo iniziale è definita con valore pari al punto iniziale.
+
+\begin{example}
+Casi particolari di sistemi di equazioni differenziali sono:
+\begin{itemize}
+  \item Equazioni differenziali ordinarie di ordine $n$. Tramite la trasformazione $y_1 = x$, $y_2 = \frac{\diff x}{\diff t}$, $y_{3} = \frac{\diff^{2} y}{\diff t^{2}}$, $\ldots$, $y_{n} = \frac{\diff^{n-1} y}{\diff t^{n-1}}$ possono essere ricondotte a sistemi lineari.
+  \item Sistemi lineari di equazioni differenziali ordinarie. Caso particolare con $f(t,x) = A(t)x + B(t)$ con $A$ funzione continua a valori matriciali e $B$ funzione continua a valori vettoriali. Se $B(t) \equiv 0$ si dicono \emph{omogenei}.
+  \item Sistemi \emph{autonomi} (cioè indipendenti dal tempo), a loro volta divisi in:
+  \begin{itemize}
+    \item Sistemi gradiente. Caso particolare con $f(x) = \nabla V(x)$.
+    \item Sistemi hamiltoniani. Caso particolare con $\frac{\diff x}{\diff t}= \nabla_{y} H(x,y)$ e $\frac{\diff y}{\diff t}= -\nabla_{x} H(x,y)$
+  \end{itemize}
+\end{itemize}
+\end{example}
+
+\subsection{Esistenza e unicità locale}
+Secondo la \emph{formulazione di Volterra}, la soluzione di un problema di Cauchy si può scrivere come integrale nel tempo del campo vettoriale sommato al dato iniziale. Da questo e dal teorema del punto fisso per le contrazioni segue il \emph{teorema di esistenza e unicità delle soluzioni}, o \emph{teorema di Cauchy}: la soluzione di un problema di Cauchy in un intorno del dato iniziale esiste ed è unica. La dimostrazione del teorema di Cauchy è costruttiva e permette di avere un algoritmo, anche se inefficiente, per costruire una soluzione a qualsiasi problema di Cauchy. Se il campo vettoriale è solo continuo, ma non localmente lipschitziano, vale invece il \emph{teorema di Peano} secondo cui la soluzione esiste ma può non essere unica.
+
+\subsection{Soluzioni massimali}
+Una soluzione è detta \emph{prolungamento} di un altra se è definita in un insieme che include l'insieme di definizione di quest'ultima e le due coincidono dove sono definite entrambe. In tal caso l'altra è detta \emph{restrizione}. Se una soluzione non ammette prolungamenti, essa è detta \emph{massimale}. 
+
+Un lemma afferma che due soluzioni di un problema di Cauchy coincidono dove sono definite entrambe e che la funzione che assume i loro valori sui rispettivi intervalli di definizione (che quindi è ben definita) è un prolungamento di entrambe.
+
+Le soluzioni massimali godono delle seguenti proprietà:
+\begin{enumerate}
+  \item Il loro intervallo di definizione è aperto.
+  \item Un problema di Cauchy ha un'unica soluzione massimale. 
+  \item Una soluzione massimale non definita su tutto $\R$ esce dai compatti spaziali. 
+\end{enumerate}
+
+\subsection{Blow-up}
+Una soluzione è detta avere \emph{blow-up nel futuro} se smette di essere definita prima di $+ \infty$ e nel tendere di $t$ all'estremo superiore dell'intervallo di definizione la sua norma tende a $+ \infty$.
+
+Se una soluzione massimale è definita in un intervallo più ristretto dell'intervallo di definizione del campo vettoriale e il dominio spaziale di quest'ultimo è $\R^{n}$, allora essa ha blow-up. Se l'insieme spaziale di definizione del campo vettoriale è $\R^{n}$, quindi, l'assenza di blow-up equivale all'essere definita per $t \to + \infty$. 
+
+Una condizione sufficiente per l'assenza di blow-up è che esistano due costanti positive $M_1,M_2$ tali che $||f(t,x)||\leq M_1+M_2||x||$. Ciò segue dal \emph{lemma di Gronwall}, il quale limita con un esponenziale la norma di un vettore la cui derivata soddisfi una condizione analoga a quella sopra. Da questa condizione sufficiente segue che le soluzioni massimali di un sistema lineare non possono avere blow-up.
+
+Dal teorema di caratterizzazione delle soluzioni massimali segue che se una soluzione massimale è contenuta in un compatto, allora essa è definita su $\R$.
+
+\section{Particolari sistemi di equazioni differenziali}
+\subsection{Equazioni reali a variabili separabili: dominio e limiti}
+Un'\emph{equazione reali a variabili separabili} è un'equazione della forma $\dot{x} = a(t)g(x)$ con $a$ continua e sia $a$ che $g$ a valori reali. Definiamo \emph{punti di equilibrio} i punti in cui $g$ si annulla.
+
+Se il dato iniziale di un problema di Cauchy è un punto di equilibrio, la funzione che vi rimane identicamente è soluzione, e quindi per il teorema di esistenza e unicità altre soluzioni non possono passarvi. Quindi se il dato iniziale di un problema non è un punto di equilibrio la soluzione corrispondente dovrà comunque rimanere confinata tra i due punti di equilibrio più vicini (o tra uno di essi e l'infinito). 
+
+La soluzione di un problema a variabili separabili che parta da un punto non di equilibrio $x_0$ ha come intervallo di esistenza quello in cui vale la disequazione \[
+\alpha < F(x_0) + \int_{t_0}^{t}a(s)\, \diff s < \beta
+,\] dove $F$ è la primitiva di $\frac{1}{g}$ in un intervallo in cui $g$ è positiva e $\alpha,\beta$ sono gli estremi inferiore e superiore di $F$ sullo stesso intervallo.
+
+Se in particolare $a(t) \equiv 1$, e quindi $\dot{x} = g(x)$, e $g$ è definita su $\R$, allora valgono le seguenti ulteriori proprietà:
+\begin{itemize}
+  \item Il campo di esistenza coincide con $\R$ (non c'è blow-up)
+  \item La soluzione parte nel passato remoto dal punto di equilibrio precedente al dato iniziale e arriva nel futuro remoto al punto di equilibrio successivo
+\end{itemize}
+
+Se $g$ è negativa sull'intervallo basta invertire la direzione di evoluzione della soluzione; se $x_0$ è maggiore dell'ultimo punto di equilibrio la soluzione partirà da esso e arriverà all'infinito. Le combinazioni di varianti sono del tutto analoghe.
+
+Se un campo vettoriale a variabili separabili è localmente lipschitziano, lo è anche la sua componente spaziale.
+
+\begin{example}
+  Esempi di sistemi a variabili separabili (con $a \equiv 1$, quindi in realtà autonomi) sono:
+\begin{itemize}
+  \item $\dot{x} = x^2$.
+  \item $\dot{x} = x(a-bx)$, noto come \emph{equazione logistica}.
+\end{itemize}
+\end{example}
+
+\subsection{Sistemi lineari a coefficienti costanti: forma esplicita}
+Si dice \emph{lineare a coefficienti costanti} un sistema della forma $\dot{x} = Ax + b(t)$ con $A$ matrice costante e $b(t)$ funzione (non necessariamente costante!) a valori vettoriali, detta \emph{forzante}. 
+
+La soluzione di un sistema lineare a coefficienti costanti si scrive come:
+\begin{itemize}
+  \item $\phi(t) = e^{A(t-t_0)x_0}$ se il sistema è omogeneo.
+  \item $\psi(t) = e^{(t-t_0)A}\Big[ x_0 + \int_{t_0}^{t} e^{(t_0-s)A}b(s)\, \diff s   \Big]$ in generale, ed è definita nello stesso dominio del termine noto.
+\end{itemize}
+
+Se $\mu_1, \ldots, \mu_k$ sono gli autovalori di $A$ con molteplicità algebriche $m_1, \ldots, m_k$ e il dato iniziale $x_0$ è una somma di $k$ vettori $\zeta_j$ appartententi agli autospazi generalizzati $\ker(A - \mu_j \mathbb{1})^{m_j}$, la soluzione del sistema omogeneo si può esprimere nella \emph{forma esplicita} \[
+\phi(t) = \sum_{j=1}^{k} e^{\mu_j(t-t_0)} \sum_{l = 0}^{m_j - 1} \frac{(t-t_0)^l}{l!}(A-\lambda \mathbb{1})^l \zeta_j
+.\] 
+
+Notiamo che se tutti gli autovalori hanno molteplicità geometrica uguale a quella algebrica la formula si semplifica notevolmente, dato che sopravvivono solo i termini con $l = 0$, e diventa $\phi(t) = \sum_{j=1}^{k} e^{\mu_j (t-t_0)}\zeta_j$. Notiamo inoltre che $\phi(t)$ è sempre a valori reali anche se gli autovalori, e quindi i termini della somma, sono in generale complessi, perché le parti immaginarie si cancellano tra loro.
+
+\subsection{Sistemi lineari omogenei a coefficienti costanti: analisi qualitativa}
+Si dice \emph{omogeneo} un sistema lineare con forzante nulla. È difficile trovare un sistema che abbia precisamente questa forma, ma vicino a punti di equilibrio molti sistemi autonomi possono essere approssimati come lineari per l'analisi qualitativa, grazie al teorema di linearizzazione.
+
+Le soluzioni di un sistema lineare omogeneo a coefficienti costanti, come quelle di tutti i sistemi autonomi, presentano \emph{invarianza per traslazioni temporali}: la linea parametrizzata dalla soluzione (il \emph{sostegno della curva integrale}) non dipende dal tempo in cui è data la condizione iniziale.
+
+Un altro fatto che vale in ogni sistema autonomo è che due (sostegni di) curve integrali non possono mai intersecarsi, dato che se lo facessero violerebbero il teorema di Cauchy.
+
+I punti di equilibrio di un sistema lineare omogeneo a coefficienti costanti altro non sono che il nucleo della matrice che lo definisce. Quindi se il determinante di questa matrice è nullo i punti di equilibrio formano un sottospazio vettoriale non banale dello spazio, altrimenti (se il determinante è non nullo) l'unico punto di equilibrio è l'origine. 
+
+Un sistema lineare omogeneo a coefficienti costanti ha soluzioni limitate in norma nel futuro (da un multiplo finito della norma della condizione iniziale) se e solo se la parte reale di tutti gli autovalori della matrice che lo definisce è non positiva e gli autovalori con parte reale nulla hanno molteplicità geometrica uguale a quella algebrica.
+
+Da questo teorema segue che: \begin{itemize}
+  \item Se il dato iniziale è nella somma diretta degli autospazi generalizzati con parte reale dell'autovalore negativa (\emph{varietà stabile}), la sua norma tende a $0$ nel futuro e a $+\infty$ nel passato.
+  \item Se il dato iniziale è nella somma diretta degli autospazi generalizzati con parte reale dell'autovalore positiva (\emph{varietà instabile}), la sua norma tende a $+\infty$ nel futuro e a $0$ nel passato.
+  \item Se il dato iniziale è nella somma diretta degli autospazi (in senso stretto) di un autovalore immaginario e del suo coniugato, la soluzione è periodica di periodo $2\pi$ diviso la parte immaginaria dell'autovalore, e l'insieme delle soluzioni periodiche con lo stesso periodo fondamentale è uno spazio vettoriale con dimensione doppia della molteplicità geometrica dell'autovalore (cioè la somma delle dimensioni degli autospazi).
+  \item Se il dato iniziale è nella somma diretta degli autospazi generalizzati con parte reale nulla (terza varietà, contiene soluzioni di equilibrio e periodiche), allora la soluzione divergerà per sottosuccessioni in maniera al massimo polinomiale sia nel passato che nel futuro.
+\end{itemize}
+$\R^{n}$ è la somma diretta delle tre varietà.
+
+\begin{example}
+  Un sistema omogeneo a coefficienti costanti che si risolve bene col metodo degli autovalori è quello con matrice \[
+  A = \begin{bmatrix} \mu & 0 & 0 \\ 0 & \alpha & -\beta \\ 0 & \beta & \alpha \end{bmatrix} 
+  \] mentre uno che si risolve bene col metodo dell'esponenziale di matrice è quello con matrice \[
+  A = \begin{bmatrix} \alpha & \beta & 0 \\ 0 & \alpha & \beta \\ 0 & 0 & \alpha \end{bmatrix}
+  \] somma dell'identità e di una matrice nilpotente.
+\end{example}
+
+\subsection{Sistemi lineari a coefficienti costanti con forzante periodica: soluzioni periodiche}
+
+Si dice \emph{a forzante periodica} un sistema lineare a coefficienti costanti la cui forzante è periodica\footnote{\textit{Duh}, ma volevo mantenere la struttura quindi vi beccate un po' di ridondanza.}. Indichiamo con \textquotedblleft periodo\textquotedblright\ quello che in realtà è il \emph{periodo minimo} della forzante.
+
+Una soluzione di un sistema lineare a coefficienti costanti con forzante periodica nel tempo di un sottomultiplo di $T$ è periodica di periodo $T$ se e solo se dopo $T$ ritorna alla condizione iniziale.
+
+Un sistema ammette soluzioni periodiche con periodo $T$ pari quello della forzante in due casi:
+\begin{itemize}
+  \item Lo spettro della matrice dei coefficienti non ha autovalori della forma $\frac{2\pi}{T}k\,i$ con $k \in \Z$ (ovvero la forzante ha periodo commensurabile a quello di una soluzione periodica del sistema omogeneo). In tal caso la soluzione in questione è unica, quella con condizione iniziale \[
+  x_0 = (\mathbb{1}-e^{-TA})^{-1} e^{TA} \int_{0}^{T} e^{-sA} b(s)\, \diff s  
+  .\] 
+  \item Lo spettro della matrice dei coefficienti ha autovalori della forma sopra, ma $e^{TA} \int_{0}^{T} e^{-sA} b(s)\, \diff s$ è nell'immagine di $(\mathbb{1}-e^{-TA})$. In tal caso ci sono infinite soluzioni periodiche, che formano uno spazio vettoriale non banale.
+\end{itemize}
+\begin{example}
+  Qui c'è l'esempione lungo, che prima o poi scriverò.
+\end{example}
+
+\subsection{Sistemi lineari dipendenti dal tempo: sistemi fondamentali e soluzione esplicita}
+Ricordiamo che un \emph{sistema lineare} (dipendente dal tempo) è un sistema della forma $\dot{x} = A(t)x + B(t)$ con $A$ funzione continua a valori matriciali e $B$ funzione continua a valori vettoriali.
+
+L'insieme delle soluzioni massimali di un sistema lineare omogeneo è uno spazio vettoriale di dimensione $n$. L'insieme delle soluzioni massimali di un sistema lineare non omogeneo si ottiene dalla somma di una sua soluzione con le combinazioni lineari delle soluzioni dell'omogeneo associato, e quindi si riconduce sostanzialmente al caso omogeneo.
+
+$n$ soluzioni massimali sono dette \emph{sistema fondamentale} se sono linearmente indipendenti. In tal caso la matrice che le ha per colonne è detta \emph{matrice fondamentale} il suo determinante è detto \emph{wronskiano}. Una matrice di soluzioni è fondamentale se e solo se il suo determinante è non nullo. Inoltre se esso è non nullo a un qualche istante lo è a ogni istante. 
+
+La matrice fondamentale evolve con la stessa matrice di evoluzione del sistema.
+
+Le matrici fondamentali di un sistema sono tutte legate da prodotti per matrici invertibili, quindi si può e conviene considerare la matrice fondamentale pari all'identità. Questo corrispondere a esprimere le soluzioni nella base delle condizioni iniziali del sistema fondamentale.
+
+Il \emph{teorema di Liouville} afferma che il wronskiano evolve con la traccia della matrice di evoluzione, e quindi ha espressione \[
+W(t) = W(t_0)\exp\bigg(\int_{t_0}^{t}\mathrm{Tr}\big(A(s)\big)\, \diff s \bigg)
+.\] Questo teorema può essere utilizzato per fornire un vincolo a qualsiasi sistema, in modo da dover determinare una soluzione vettoriale in meno.
+
+La soluzione di un sistema lineare nel caso totalmente generale, se la matrice fondamentale dell'omogenea associata è $\Phi(t)$, è \[
+x(t) = \Phi(t)\Phi(t)^{-1}(t_0)x_0 + \Phi(t)\int_{t_0}^{t} \Phi^{-1}(s)b(s)\,\diff s  
+,\] di classe $\mathcal{C}^{(1)}$. Se $A(t)$ è costante, un sistema fondamentale è $\Phi(t) = e^{tA}$ e la situazione si riduce a quella già vista.
+
+\subsection{Sistemi lineari omogenei a coefficienti periodici: classificazione del comportamento}
+
+Si dice \emph{omogeneo a coefficienti periodici} un sistema lineare in cui la matrice dei coefficienti $A$ è periodica. Come nel caso della forzante periodica, anche qui con \textquotedblleft periodo\textquotedblright\ indicheremo il periodo minimo. 
+
+Il \emph{teorema di Floquet} afferma che per un sistema di questo genere esistono una matrice costante $R$ e una funzione periodica di periodo $T$ continua a valori matriciali $z(t)$ tali che un sistema fondamentale sia $\Phi(t) = z(t)e^{tR}$. Lo studio della matrice non periodica $e^{tR}$ può indicare \textquotedblleft quanto si è lontani\textquotedblright\ da una soluzione periodica.
+
+Se $\Phi_1$ e $\Phi_2$ sono sistemi fondamentali di un sistema a coefficienti periodici, le matrici $\Phi_1^{-1}(0)\Phi_1(T)$ e $\Phi_2^{-1}(0)\Phi_2(T)$ sono simili, e in particolare hanno lo stesso spettro. Da ora in poi pensiamo alle soluzioni nella base delle condizioni iniziali, in modo che valga $\Phi(0) = \mathbb{1}$: possiamo infatti farlo senza cambiare lo spettro. Gli autovalori di $\Phi(t)$ sono detti \emph{moltiplicatori di Floquet}.
+
+Tra i moltiplicatori di Floquet non ci può essere $0$ e per ogni moltiplicatore esiste una soluzione che dopo un periodo è pari a se stessa moltiplicata per il moltiplicatore. 
+
+Vale quindi la seguente classificazione del comportamento:
+\begin{itemize}
+  \item Il sistema ammette soluzioni limitate nel futuro se e solo se esiste un moltiplicatore con modulo minore o uguale a $1$.
+  \item Il sistema ammette soluzioni periodiche con lo stesso periodo dei coefficienti se e solo se fra i moltiplicatori c'è $1$. 
+  \item Il sistema ammette soluzioni che tendono all'origine nel futuro se e solo se esiste un moltiplicatore con modulo strettamente minore di 1. 
+  \item Il sistema ammette soluzioni periodiche con periodo multiplo $k$-esimo di quello dei coefficienti se e solo se fra i moltiplicatori c'è una radice $k$-esima di $1$. 
+\end{itemize}
+
+Questa teoria si può utilizzare per classificare il comportamento di un oscillatore armonico con attrito e richiamo dipendenti dal tempo.
+
+Se $\lambda_1, \ldots, \lambda_k$ sono gli autovalori di $R$ con molteplicità algebriche $m_1, \ldots, m_k$ e il dato iniziale $x_0$ è una somma di $k$ vettori $\zeta_j$ appartententi agli autospazi generalizzati $\ker(A - \lambda_j \mathbb{1})^{m_j}$, la soluzione del sistema omogeneo si può esprimere come \[
+\phi(t) = z(t) \sum_{j=1}^{k} e^{\lambda_j(t-t_0)} \sum_{l = 0}^{m_j - 1} \frac{(t-t_0)^l}{l!}(R-\lambda_j \mathbb{1})^l \zeta_j
+.\] 
+Inoltre i moltiplicatori di Floquet sono $\mu_j = e^{\lambda_j T}$ e hanno la stessa molteplicità algebrica.
+
+\subsection{Sistemi lineari omogenei autonomi bidimensionali: classificazione dell'equilibrio}
+Un \emph{sistema lineare omogeneo autonomo bidimensionale} ha forma $\dot{x} = Ax$, dove $A$ è una matrice quadrata reale non nulla. 
+
+Se $A$ è invertibile, l'unico punto di equilibrio è l'origine. In caso contrario, i punti di equilibrio formano una retta pasante per l'origine. Questo è un caso particolare dell'osservazione fatta per i sistemi lineari omogenei a coefficienti costanti.
+
+È possibile scrivere la forma generale della soluzione e classificare i tipi di equilibrio dell'originein base agli autovalori della matrice del sistema:
+\begin{itemize}
+  \item Autovalori reali distinti: \[
+  \phi(t) = c_1e^{\lambda_1 t} \begin{pmatrix} v_1\\ v_2 \end{pmatrix} + c_2 e^{\lambda_2 t}\begin{pmatrix} w_1\\ w_2 \end{pmatrix}
+  .\] con $c_1,c_2$ reali. A seconda dei segni degli autovalori possono presentarsi varie situazioni:
+  \begin{itemize}
+    \item Autovalori negativi: l'origine è asintoticamente stabile e domina la direzione dell'autovettore minore in modulo. L'origine è detta \emph{nodo stabile} o \emph{pozzo}.
+    \item Autovalori positivi: l'origine è instabile e domina la direzione dell'autovalore maggiore in modulo. L'origine è detta \emph{nodo instabile} o \emph{sorgente}.
+    \item Autovalori uno positivo e uno negativo: l'origine è instabile e le soluzioni sono rami di iperbole. L'origine è detta \emph{sella} o \emph{colle}.
+    \item Un autovalore nullo: va considerato caso per caso. L'origine può essere punto di equilibrio stabile, instabile o asintoticamente stabile, e nei primi due casi esiste una retta di punti di equilibrio.  
+  \end{itemize}
+  \item Autovalori reali coincidenti: 
+  \begin{itemize}
+    \item Molteplicità geometrica $2$:\[
+      \phi(t) = c e^{\lambda t}
+      .\] con $c$ arbitrario in $\R^2$. L'origine è detta \emph{nodo a stella}, ed è stabile o instabile a seconda del segno dell'autovalore. 
+      \item Molteplicità geometrica 1:\[
+      \phi(t) = c_1 e^{\lambda t} + c_2 te^{\lambda t}
+      .\] con $c_2$ autovettore e $c_1$ determinato in qualche modo. L'origine è detta \emph{nodo improprio} ed è stabile o instabile a seconda del segno dell'autovalore.
+  \end{itemize}
+  \item Autovalori complessi coniugati: 
+  \begin{itemize}
+    \item Autovalori immaginari puri:\[
+    \phi(t) = c_1 e^{i \beta t} \begin{pmatrix} v_1\\ v_2 \end{pmatrix}  + c_2 e^{-i \beta t} \begin{pmatrix} v_1\\ v_2 \end{pmatrix}
+    .\] L'origine è detta \emph{centro} ed è stabile, ma non asintoticamente. 
+    \item Autovalori con parte reale non nulla: se la parte reale è negativa l'origine è asintoticamente stabile ed è detta \emph{fuoco stabile} o \emph{pozzo a spirale}, mentre se è positiva l'origine è instabile ed è detta \emph{fuoco instabile} o \emph{sorgente a spirale}.
+  \end{itemize}
+\end{itemize}
+
+\section{Regolarità delle soluzioni e dipendenza dalle approssimazioni}
+
+\subsection{Proprietà di regolarità locali: dipendenza continua}
+Prendendo due problemi di Cauchy con condizioni iniziali abbastanza vicine in spazio e tempo, le loro soluzioni massimali sono definite almeno in un intervallo temporale chiuso in comune. 
+
+Da qui segue la \emph{dipendenza continua dai dati iniziali}: sotto le stesse ipotesi, la norma uniforme della differenza tra soluzioni nella scatola di definizione comune sarà limitata (a mento di costanti di proporzionalità) dalla differenza temporale e spaziale tra le condizioni iniziali. In realtà la dipendenza è più che continua: è uniforme e per una successione di dati iniziali convergenti a $(t_0,x_0)$ le rispettive soluzioni convergono alla soluzione con dato iniziale $(t_0,x_0)$. Si noti che questa è una proprietà locale. 
+
+\subsection{Mappa flusso e proprietà di regolarità globali}
+La \emph{mappa flusso} di un sistema è la funzione che a un tempo e una condizione iniziale associa la posizione della soluzione del problema di Cauchy con quella condizione iniziale. Il suo dominio sono le triple tempo-tempo iniziale-posizione iniziale tali che la soluzione con la condizione iniziale data è definita al tempo dato.
+
+Nel caso di un sistema lineare a coefficienti costanti il dominio della mappa flusso è un aperto di $\R^{n+2}$. La mappa flusso non è altro che la forma esplicita della soluzione per una data condizione iniziale: \[
+  \Phi(t;t_0,x_0) = e^{(t-t_0)A}\Bigg[ x_0 + \int_{t_0}^{t} e^{(t_0-s)A}b(s)\, \diff s   \Bigg]
+.\] In questo caso la mappa flusso è continua e la sua derivata è data dall'espressione del campo vettoriale con $x$ rimpiazzato dalla mappa. In particolare, la sua regolarità dipende da quella del campo vettoriale.
+
+Data una qualsiasi condizione iniziale, è sempre possibile trovarci intorno una scatola contenuta nel dominio della mappa flusso, e in questo intorno la mappa è continua.
+
+Da qui si dimostra la \emph{regolarità globale} della mappa flusso: il suo dominio è aperto in $\R^{n+2}$, e la mappa e la sua derivata temporale sono continue nel dominio. Se inoltre il campo vettoriale è di classe $\mathcal{C}^{(k)}$ e le sue derivate $k$-esime sono tutte localmente lipschitziane spazialmente, allora sono di classe $\mathcal{C}^{(k)}$ sul dominio anche la mappa flusso e la sua derivata temporale.
+
+La mappa flusso è inoltre \emph{invariante per diffeomorfismi}: in particolare nel caso autonomo, l'immagine attraverso un diffeomorfismo del flusso di un punto iniziale a un certo tempo è uguale al flusso allo stesso tempo dell'immagine del punto iniziale.
+
+\subsection{Dipendenza dalle approssimazioni di dati iniziali e campo vettoriale}
+
+Per dati iniziali vicini, oltre a esistere in un intervallo comune, le soluzioni differiscono al massimo esponenzialmente nel tempo e linearmente in punti e tempo iniziali. La dimostrazione di ciò segue dal \emph{lemma di Gronwall integrale}, che limita con un esponenziale una grandezza continua che cresca nel tempo come il suo integrale fino a quel tempo.
+
+Il \emph{teorema di Kamke} afferma che una successione di funzioni che converge al campo vettoriale uniformemente sui compatti avrà soluzioni che sono definite in un intervallo comune al campo finale e che vi convergono uniformemente. Il teorema vale però solo a livello locale, mentre a livello globale le soluzioni possono variare anche molto, come dimostra il considerare il sistema gradiente $F(x,y) = y^2-\epsilon x^3$ al variare del parametro $\epsilon$.
+
+Tutte queste dimostrazioni derivano in ultima analisi dall'esistenza in un intervallo
+
+\section{Sistemi fisici}
+\subsection{Sistemi di tipo gradiente: assenza di soluzioni periodiche, punti limite}
+Si dice \emph{sistema di tipo gradiente} un sistema del tipo $\dot{x} = \nabla F(x)$ con $F$ di classe $\mathcal{C}^{(2)}$, detta \emph{potenziale}. I sistemi gradiente sono generalizzazioni naturali dei problemi autonomi in una variabile.
+
+Gli autovalori di un sistema gradiente sono reali perché essendo il potenziale $\mathcal{C}^{(2)}$ vale il teorema di Schwarz e quindi la sua hessiana, che è la jacobiana del sistema, è simmetrica, e si applica dunque il teorema spettrale.
+
+I punti di equilibrio di un sistema gradiente sono i punti critici del potenziale. Se l'insieme dei punti di equilibrio di un sistema gradiente non ha punti di accumulazione, allora tutte le soluzioni che partono da punti di equilibrio vi rimangono, mentre per ogni soluzione che non parte da punti di equilibrio il valore di $F$ calcolato lungo la linea di flusso è strettamente crescente e la soluzione non è periodica. Se inoltre la soluzione rimane in un compatto per ogni tempo, essa è definita in $\R$ ed esistono due punti di equilibrio tali che la soluzione parta da uno di essi nel passato remoto e arrivi all'altro nel futuro remoto.
+
+Il potenziale (a meno di una costante additiva) è funzione di Lyapunov del sistema attorno a un suo minimo forte. Inoltre è funzione di Lyapunov forte del sistema attorno a un suo minimo isolato (e quindi forte).
+
+Si dice \emph{insieme di livello} di un sistema gradiente il luogo dei punti in cui il potenziale assume un certo valore. Un punto di un insieme di livello si dice \emph{punto regolare} se il gradiente in esso è non nullo, e un valore del potenziale è detto \emph{valore regolare} se tutti i punti del suo insieme di livello sono regolari. 
+
+Il campo vettoriale di un sistema gradiente è perpendicolare agli insiemi di livello in ogni loro punto regolare. Inoltre, le soluzioni sono intrappolate negli insiemi di livello di intervalli chiusi. 
+
+Gli \emph{insiemi $\omega$- e $\alpha$-limite} di una soluzione di un generico sistema autonomo sono gli insiemi di punti tali per cui esiste una successione di tempi che va rispettivamente nel passato e nel futuro per cui la soluzione tende a quei punti. Siccome il sistema è temporalmente invariante, è possibile definire tali insiemi anche per un punto, tramite la soluzione univocamente associata.
+
+Gli insiemi limite sono chiusi e sono invarianti sotto il campo vettoriale.
+
+Ad esempio:
+\begin{itemize}
+  \item Un punto di equilibrio ha entrambi gli insiemi limite che contengono solo esso stesso. 
+  \item Un pozzo è l'insieme $\omega$-limite per tutti i punti nel suo bacino di attrazione, mentre non ha un insieme $\alpha$-limite determinabile in generale.
+  \item Una sorgente è l'insieme $\alpha$-limite per tutti i punti nel suo bacino di repulsione, mentre non ha un insieme $\omega$-limite determinabile in generale.
+  \item Una sella è l'insieme $\alpha$-limite della sua curva instabile e $\omega$-limite di quella instabile. 
+\end{itemize}
+
+In generale, gli insiemi limite non sono costituiti solo da punti di equilibrio (ad esempio, possono essere anche cicli limite), ma ciò è vero nel caso dei sistemi gradiente. Quindi se un sistema gradiente ha solo punti di equilibrio isolati esso non ammette cicli limite. \textit{Probabilmente non li ammette nemmeno se ha punti di equilibrio isolati, ma il Parenti-Parmeggiani non lo dice quindi noi stiamo sul sicuro.}
+
+
+\subsection{Sistemi hamiltoniani: integrabilità}
+Si dice \emph{sistema hamiltoniano} è un sistema della forma \[
+\begin{cases}
+  \frac{\diff x}{\diff t} = \nabla_y H(x,y) \\ \frac{\diff y}{\diff t} = - \nabla_x H(x,y)
+\end{cases}
+\] dove $H(x,y)$, detta \emph{hamiltoniana}, è una funzione $\mathcal{C}^{(2)}$ su $\R^{2n}$ a valori reali. Per un tale sistema, $H$ è una \emph{costante del moto}: è costante lungo le soluzioni, che rimarranno quindi sugli insiemi di livello. Il diagramma di fase di un sistema hamiltoniano in $\R^{2}$ coincide quindi con le curve di livello dell'hamiltoniana. Questo si può vedere considerando il \emph{potenziale quartico} $\ddot{x} = -x^3 + x$
+
+È possibile ricavare esplicitamente la costanza dell'hamiltoniana lungo le soluzioni dell'\emph{oscillatore armonico} (non smorzato) $\ddot{x} = -kx$.
+
+Se un insieme di livello è compatto, le soluzioni su di esso saranno definite su $\R$. Se inoltre $n=1$ e l'insieme di livello non contiene punti di equilibrio, ogni sua componente connessa è omeomorfa a una circonferenza e tutte le soluzioni con dato iniziale su di esso sono periodiche. 
+
+Le \emph{parentesi di Poisson} sono un operatore che misura la \textquotedblleft non commutatività delle derivate\textquotedblright\: \[
+\{ f,g \} = \sum_{j=1}^{n} \bigg( \frac{\partial f}{\partial y_j} \frac{\partial g}{\partial x_j} - \frac{\partial f}{\partial x_j}\frac{\partial g}{\partial y_j}\bigg)
+.\] Il campo vettoriale nelle componenti di $x$ e $y$ è dato dalla parentesi di Poisson dell'hamiltoniana con la stessa componente dell'altra variabile. 
+
+Una funzione $\mathcal{C}^{(2)}$ si dice \emph{integrale primo} se la sua parentesi di Poisson con l'hamiltoniana è nulla. Due integrali primi si dicono in \emph{involuzione} se i loro gradienti (totali su $x$ e $y$) sono linearmente indipendenti. Un sistema hamiltoniano in $\R^{n}$ si dice \emph{integrabile} se ammette $n$ integrali primi in involuzione. 
+
+Per un sistema integrabile, vale il \emph{teorema di Arnold-Liouville}: se un insieme di livello è una varietà regolare compatta, allora ciascuna sua componente connessa è omoeomorfa a un toro $n$-dimensionale ed esiste una trasformazione di variabili che non cambia la forma del sistema (\emph{canonica}) e rende l'hamiltoniana dipendente solo da una delle due nuove variabili. Le nuove variabili sono dette \emph{azione-angolo}: le componenti dell'azione sono $n$ integrali primi in involuzione, mentre quelle dell'angolo sono variabili angolari. Inoltre, le soluzioni sono \emph{quasi-periodiche}: vale \[
+\phi_i (t) = \phi_i (t_0) + \frac{\partial K}{\partial I_i} (I_1,\ldots,I_n) \cdot (t-t_0) 
+.\] con la derivata parziale e le $I_i$ costanti lungo la soluzione.
+
+\begin{example}
+  Un esempio di sistema hamiltoniano è il \emph{sistema di Lotka-Volterra} \[
+  \begin{cases}
+  \dot{x} = x(a-by) \\ \dot{y} = y(-c+dx)
+  \end{cases}
+  \] che può essere visto come sistema hamiltoniano nelle variabili $X = \log x, Y = \log y$ con hamiltoniana $H(X,Y) = aY - b e^Y + cX -d e^X$. Esso ha due punti di equilibrio, e le soluzioni del sistema sono tutte periodiche attorno a quello che non è l'origine. È inoltre possibile calcolare i valori medi di ciascuna delle due variabili sulle soluzioni. 
+\end{example}
+
+I punti di equilibrio di un sistema hamiltoniano coincidono con i punti critici dell'hamiltoniana.
+
+Se un insieme di livello di un sistema hamiltoniano è compatto, ma contiene punti di equilibrio, le soluzioni che vi stanno sopra possono essere \emph{omocline}, ovvero tendere allo stesso punto di equilibrio nel passato e nel futuro, oppure \emph{eterocline}, ovvero tendere a due punti di equilibrio diversi nel passato e nel futuro.
+
+Gli autovalori del linearizzato di un sistema hamiltoniano sono o reali opposti o immaginari puri coniugati. 
+
+Un punto di massimo o minimo forte isolato per l'hamiltoniana è un punto di equilibrio stabile, ma non asintoticamente stabile, per il sistema. Inoltre, un punto di equilibrio che non è di massimo o minimo forte per l'hamiltoniana non è stabile.
+
+\section{Stabilità attorno a punti di equilibrio}
+
+\subsection{Definizioni e proprietà generali}
+Da qui in poi consideriamo solo sistemi \emph{autonomi}, ovvero con campo vettoriale dipendente solo dalllo spazio e non dal tempo.
+
+Un punto si dice \emph{punto di equilibrio} per un sistema autonomo se il campo vettoriale valutato in esso è nullo. Una soluzione con condizione iniziale in un punto di equilibrio vi rimane per ogni tempo. 
+
+Un punto di equilibrio si dice \emph{stabile} se ammette un intorno tale che ogni soluzione che vi ha condizione iniziale sia definita su $\R$ e rimanga in un intorno al massimo leggermente più grande per ogni tempo. Se un punto di equilibrio non è stabile (e quindi la soluzione esce da qualsiasi intorno del punto) è detto \emph{instabile}. Basta un punto con soluzione uscente in ciascun intorno affinché un punto sia instabile. Inoltre, un sistema in cui avviene blow-up non può ammettere punti di equilibrio stabile. Questo è ad esempio il caso di $\dot{x} = x^2$, in cui però l'instabilità può essere verificata anche con un conto diretto.
+
+La nozione di stabilità è \emph{invariante per diffeomorfismo}: l'insieme dei punti di equilibrio di un sistema trasformato attraverso un diffeomorfismo è l'immagine dell'insieme dei punti di equilibrio del sistema originale attraverso lo stesso diffeomorfismo, e inoltre un punto di equilibrio è stabile se e solo se lo è la sua immagine. Ciò consente di ricondurre ogni sistema lineare (autonomo) a uno omogeneo per lo studio dei punti di equilibrio.
+
+Un punto di equilibrio si dice \emph{asintoticamente stabile} se ammette un intorno per cui tutte le soluzioni con condizione iniziale in esso tendono al punto nel futuro. Un punto asintoticamente stabile è necessariamente un punto di equilibrio isolato.
+
+\subsection{Stabilità dei punti di equilibrio di sistemi lineari}
+Nei sistemi lineari valgono le seguenti \emph{condizioni necessarie e sufficienti per la stabilità}:
+\begin{itemize}
+  \item L'origine è stabile se solo se tutti gli autovalori della matrice del sistema hanno parte reale non positiva e ogni autovalore con parte reale nulla ha molteplicità algebrica uguale a quella geometrica. 
+  \item L'origine è asintoticamente stabile se e solo se tutti gli autovalori della matrice del sistema hanno parte reale negativa.
+  \item Un punto del kernel è stabile o asintoticamente stabile se e solo se lo è l'origine.
+\end{itemize}
+
+\subsection{Funzioni di Lyapunov}
+Una funzione si dice \emph{funzione di Lyapunov} per un sistema attorno a un punto di equilibrio se esiste un intorno del punto tale che: 
+\begin{itemize}
+  \item È nulla nel punto di equilibrio e positiva in ogni altro punto.
+  \item Il prodotto scalare del suo gradiente con il campo vettoriale è non positivo in ogni punto dell'intorno. 
+\end{itemize}
+Se il prodotto scalare è nullo in ogni punto dell'intorno diverso da quello di equilibrio, la funzione è detta \emph{di Lyapunov forte}.
+
+Il \emph{teorema di Lyapunov} afferma che se esiste una funzione di Lyapunov attorno a un punto di equilibrio, allora il punto è stabile. Se inoltre la funzione è forte, allora il punto è asintoticamente stabile. 
+
+Una condizione analoga vale per l'instabilità, nel senso che se esiste una funzione che è nulla in un punto di equilibrio e positiva in un suo intorno, e con prodotto scalare col campo vettoriale positivo nello stesso intorno privato del punto, allora il punto è instabile. 
+
+\begin{example}
+  Un esempio è il sistema \[
+  \begin{cases}
+    \dot{x} = -x^3 \\ \dot{y} = -y(x^2+z^2+1) \\ z = -\sin z
+  \end{cases}
+  \] che ha funzione di Lyapunov forte attorno all'origine $g(x) = x^2+y^2+z^2$. Per questo sistema, per inciso, i piani $z=n\pi$ contengono le soluzioni che vi iniziano, ovvero sono \emph{piani invarianti}, e non possono essere attraversati.
+\end{example}
+
+\subsection{Linearizzazione}
+Una condizione necessaria per la stabilità di un punto (e quindi, negandola, una condizione sufficiente per la sua instabilità) e una condizione sufficiente per la sua stabilità asintotica sono fornite dal \emph{teorema di linearizzazione}:
+\begin{itemize}
+  \item Se un punto di equilibrio è stabile per il sistema, allora tutti gli autovalori della jacobiana del campo vettoriale in quel punto hanno parte reale non positiva.
+  \item Se tutti gli autovalori della jacobiana del campo vettoriale in un punto di equilibrio hanno parte reale negativa, allora quel punto è asintoticamente stabile.
+\end{itemize}
+Il sistema lineare che ha come matrice la jacobiana del campo vettoriale in un punto è noto come \emph{linearizzato} attorno a quel punto. Il teorema può essere formulato anche dicendo che se l'origine del linearizzato attorno a un punto è instabile lo sarà anche il punto nel sistema originale, e analogamente se l'origine del linearizzato è asintoticamente stabile. 
+
+Notiamo che la condizione di semplice stabilità non è sufficiente perché manca l'informazione sulle molteplicità algebrica degli autovalori nulli. In linea di principio il linearizzato può essere instabile e il sistema originale essere stabile, o viceversa il linearizzato può essere stabile e il sistema originale instabile. È molto più semplice trovare esempi del secondo caso: si pensi a $\dot{x} = x^2$. 
+
+Un punto di equilibrio si dice \emph{iperbolico} se la matrice del suo linearizzato non ha autovalori con parte reale nulla. Una formulazione equivalente del teorema di linearizzazione è che il flusso di un sistema vicino a un punto iperbolico è localmente topologicamente equivalente a quello del linearizzato.
+
+\begin{example}
+  A volte è possibile trovare un diffeomorfismo globale che trasforma un sistema nel suo linearizzato, ad esempio il sistema \[
+  \begin{cases}
+    \dot{x} = x+y^2 \\ \dot{y} = -y
+  \end{cases} \text{ con il diffeomorfismo } \begin{cases}
+    u = x + \frac{1}{3} y^2 \\ v = y
+  \end{cases}
+  .\] A volte invece il diffeomorfismo è solo locale, come nel caso del sistema \[
+  \begin{cases}
+    \dot{x} = \frac{1}{2} x - y -\frac{1}{2} (x^3+y^2x) \\ \dot{y} = x + \frac{1}{2}y -\frac{1}{2} (y^3 + x^2y)
+  \end{cases} \text{passato in coordinate polari.}
+  \] In entrambi i casi, dove il diffeomorfismo funziona i flussi del sistema linearizzato e di quello originale sono \emph{topologicamente equivalenti} l'uno all'altro.
+  
+  Sistemi che invece non ammettono diffeomorfismi sono \[
+  \begin{cases}
+    \dot{x} = -y + \epsilon x (x^2+y^2) \\ \dot{y} = x + \epsilon y (x^2+y^2)
+  \end{cases} \text{in coordinate polari,} 
+  .\] per cui a seconda del valore di $\epsilon$ l'origine è asintoticamente stabile o instabile, ma mai stabile come nel linearizzato, e \[
+  \begin{cases}
+    \dot{x} = x^2 \\ \dot{y} = -y
+  \end{cases}
+  .\] in cui si passa dall'avere una sola curva che tende all'origine ad averne infinite, e si perde quindi l'equivalenza topologica. Questi problemi sono legati all'avere linearizzati con autovalori immaginari puri o nulli.
+\end{example}
+
+\subsection{Alcuni esempi di determinazione di stabilità per sistemi non lineari} 
+\begin{example}
+  L'\emph{oscillatore di Duffing} senza forzante è un sistema della forma $\ddot{x} + \delta \dot{x} +x^3 = 0$. La stabilità dei suoi punti di equilibrio può essere studiata con il teorema di linearizzazione.
+  
+  Un sistema con un punto di equilibrio stabile nel linearizzato, ma che risulta stabile usando come funzione di Lyapunov $g(x) = x^2+y^2+z^2$, è \[
+    \begin{cases}
+      \dot{y_1} = y_2 \\ \dot{y_2} = -y_1 - \epsilon y_1^2 y_2
+    \end{cases}
+    \] Un sistema per cui serve usare Lyapunov con una funzione leggermente più complicata è \[
+      \begin{cases}
+        \dot{y_1} = -3y^2 \\ \dot{y_2} = y_1 - 2 \alpha y_2^3
+      \end{cases}
+      \] 
+      
+      La stabilità del punto di equilibrio non-origine di Lotka-Volterra può essere vista anche con il teorema di Lyapunov, usando come funzione l'hamiltoniano. Dato che è stabilità non asintotica, non si può invece usare il teorema di linearizzazione.
+\end{example}
+
+\subsection{Teorema della curva stabile}
+Un sistema si dice scritto in \emph{forma canonica} se ogni componente del suo campo vettoriale è scritta come un termine lineare nella variabile stessa sommato a un termine che decresce più rapidamente della distanza dall'origine. 
+
+In generale, da un punto sella passano una \emph{varietà stabile}, che vi tende nel futuro, e una \emph{varietà instabile}, che vi proviene nel passato. Per sistemi bidimensionali, queste varietà si indicano come \emph{curve}.
+
+Vale il \emph{teorema della curva stabile}, il quale afferma che se l'origine di un sistema bidimensionale scritto in forma canonica è una sella, allora esiste una \emph{curva stabile locale} passante per l'origine e definita in un suo intorno, con le seguenti proprietà:
+\begin{itemize}
+  \item Tutte le soluzioni che iniziano sulla curva stabile vi rimangono e tendono all'origine nel futuro.
+  \item La curva stabile è tangente all'asse $y$.
+  \item Tutte le soluzioni che iniziano nell'intorno, ma non sulla curva, escono dall'intorno nel futuro.
+\end{itemize}
+La \emph{curva stabile globale} si ottiene prendendo una condizione iniziale sulla curva locale e mandando il tempo al passato remoto. La curva stabile è l'asse stabile del linearizzato; solo l'asse stabile viene deformato perché il sistema è scritto in forma canonica. 
+
+Esiste un analogo risultato per un \emph{curva instabile} tangente all'asse $x$ e su cui le soluzioni vengono dall'origine nel passato remoto.
+
+È possibile generalizzare il teorema da $\R^{2}$ a $\R^{n}$, ovvero formulare un \emph{teorema della varietà stabile}. Se il linearizzato di un sistema ha $k$ autovalori con parte reale negativa e $n-k$ autovalori con parte reale positiva, allora esistono una varietà stabile e una instabile, ed esse sono sottovarietà di dimensione rispettivamente $k$ ed $n-k$. Per il teorema di Dini, inoltre, esse sono grafici di una funzione rispettivamente $\R^{k} \to \R^{n-k}$ e $\R^{n-k} \to \R^{k}$.
+
+\begin{example}
+  Ad esempio, il sistema \[
+  \begin{cases}
+    \dot{x} = -x \\ \dot{y} = -y \\ \dot{z} = z + x^2 + y^2
+  \end{cases}
+  \] ha come varietà instabile l'asse $z$ e come varietà stabile un paraboloide passante per l'origine. Si noti che in questo caso il risultato è in realtà definito globalmente, dato che esiste un diffeomorfismo che trasforma il sistema nel suo linearizzato.
+\end{example}
+
+\section{Introduzione alle biforcazioni}
+\subsection{Definizione e condizione necessaria}
+In questa sezione consideriamo sistemi della forma $\dot{x} = f_a(x)$ con $f_a$ funzione dipendente in maniera $\mathcal{C}^{(1)}$ da un parametro reale $a$. Si dice \emph{biforcazione} un cambiamento significativo nella \emph{struttura} dei punti di equilibrio del sistema, ossia nel loro numero o nella loro natura. 
+
+Un punto di equilibrio si dice \emph{iperbolico} per un sistema unidimensionale per un dato valore del parametro se la derivata del campo vettoriale con quel parametro non è nulla. Questo altro non è che un caso particolare della definizione precedente di punto iperbolico. 
+
+Richiamiamo il \emph{teorema di Dini} in due dimensioni, il quale afferma che se una funzione si annulla in un punto senza che si annulli una delle sue derivate, esiste un intorno in cui la varietà definita dalla funzione è il grafico di una funzione della variabile la cui derivata può annullarsi, e questa funzione inoltre lega le coordinate del punto di origine, ha la stessa regolarità dell'altra e la sua derivata è calcolabile. 
+
+Dal teorema si ricava la seguente proposizione: una piccola variazione del campo vettoriale varia un punto di equilibrio iperbolico in modo continuo, che tende al punto originale per la variazione che tende a $0$ e che ha la stessa natura. La non iperbolicità è però una condizione solo necessaria, non sufficiente, per l'insorgere di biforcazioni.
+
+\subsection{Biforcazioni sella-nodo: condizione sufficiente}
+Se al variare del parametro si ha che prima non ci sono punti di equilibrio, per un valore preciso ce n'è uno instabile e poi ce ne sono due, uno instabile e uno stabile, si dice che il sistema presenta una \emph{biforcazione sella-nodo}. 
+
+\begin{example}
+  Un esempio di un sistema che presenta una biforcazione sella-nodo è $\dot{x} = x^2+a$. 
+\end{example}
+
+Una \emph{condizione sufficiente} per l'insorgere di biforcazioni sella-nodo in sistemi unidimensionali è invece la seguente: l'avere un punto di equilibrio non iperbolico di un campo vettoriale $\mathcal{C}^{(2)}$, con derivata seconda non nulla e con derivata nel parametro non nulla nel punto (\emph{condizione di non tangenzialità}). Il grafico del parametro in funzione della coordinata dei punti di equilibrio sarà una parabola con concavità verso l'alto o verso il basso.
+
+\subsection{Nullocline e biforcazione eteroclina}
+Si dice \emph{$x_{j}$-nulloclina} di un sistema il luogo in cui la componente del campo vettoriale lungo $x_{j}$ si annulla.
+
+I punti di equilibrio sono le intersezioni di tutte le nullocline.
+
+Vale la \emph{proprietà di inversione delle frecce}: le componenti non nulla del campo vettoriale su una nulloclina invertono il loro verso quando si attraversa un punto di equilibrio con jacobiana invertibile.
+
+Le nullocline dividono il piano delle fasi in regioni in cui la direzione del campo vettoriale è compresa entro un angolo retto. 
+
+Un sistema presenta una \emph{biforcazione eteroclina} quando per un certo valore del parametro ammette una soluzione eteroclina il cui sostegno è una nulloclina, mentre per gli altri valori la nulloclina si \textquotedblleft apre\textquotedblright\ e lascia passare le soluzioni dall'infinito all'infinito. 
+
+\begin{example}
+  Un sistema che presenta una biforcazione eteroclina è \[
+    \begin{cases}
+      \dot{x} = x^2-1 \\ \dot{y} = -xy + a (x^2-1)
+    \end{cases}
+    .\] In questo caso, per $a=0$ un pezzo della $y$-nulloclina sull'asse $x$ è allo stesso tempo parte della curva instabile di una sella e di quella stabile di un'altra, e quindi è un'eteroclina, mentre per gli altri valori di $a$ le due curve si separano.
+    \subsection{Altre biforcazioni}
+\end{example}
+    Un sistema presenta una \emph{biforcazione a forcone} quando da un singolo punto di equilibrio instabile passa a un punto stabile in mezzo a due instabili. 
+    
+\begin{example}
+  Un esempio di sistema che presenta una biforcazione a forcone è $\dot{x} = x^3-ax$.
+\end{example}
+
+\begin{example}
+  Un esempio di sistema bidimensionale che presenta una biforcazione sella-nodo è \[
+  \begin{cases}
+    \dot{x} = x^2+a \\ \dot{y} = -y
+  \end{cases}
+  \]
+\end{example}
+
+Un sistema presenta una \emph{biforcazione di Hopf} se un punto di equilibrio asintoticamente stabile si trasforma in un ciclo limite asintoticamente stabile. 
+
+\begin{example}
+  Un esempio di sistema con biforcazione di Hopf è il \emph{Brusselator} \[
+  \begin{cases}
+    \dot{x} = ax - y + x(x^2+y^2) \\ \dot{y} = x + ay - y(x^2+y^2)
+  \end{cases}
+  \] usato come modello di alcune reazioni chimiche.
+\end{example}
+
+\section{Introduzione alle soluzioni periodiche} \label{sec:solPer}
+\subsection{Definizioni e metodi}
+
+Una funzione $f$ continua non costante definita da $\R$ in $\R^{n}$ si dice \emph{periodica} se esiste un $\tau$ non nullo tale che per ogni $t$ nel dominio della funzione $f(t + \tau) = f(t)$. Tali $\tau$ sono detti \emph{periodi} di $f$.
+
+L'insieme dei periodi di una funzione periodica forma un sottogruppo proprio di $(\R,+)$. Esiste quindi un divisore intero comune di tutti i periodi, detto \emph{periodo minimo}.
+
+Un sistema autonomo unidimensionale non può ammettere soluzioni periodiche, per via della definitezza del campo vettoriale. Per sistemi lineari a coefficienti costanti omogenei e con forzante periodica, e per sistemi lineari a coefficienti periodici, ci sono criteri per l'esistenza di soluzioni periodiche enunciati in questo corso.
+
+Una soluzione periodica si dice \emph{stabile} se ammette un intorno che a sua volta ammette un sottoinsieme aperto, sempre intorno della sua curva integrale, tale che le soluzioni non escano dall'intorno più grande. Se inoltre la distanza delle soluzioni dalla curva tende a $0$, essa si dice \emph{asintoticamente stabile}. Una soluzione periodica non stabile è detta \emph{instabile}. 
+
+Se è noto il comportamento di tutte le soluzioni di un sistema con campo vettoriale periodico in un suo periodo, esso è noto in ogni tempo.
+
+\subsection{Mappa di Poincaré}
+Si dice \emph{mappa di Poincaré} la funzione che associa a ogni punto il valore della sua mappa flusso dopo un periodo del campo vettoriale. Se la mappa di Poincaré ammette un punto fisso, il sistema ha una soluzione periodica di periodo pari a quello cel campo vettoriale. La derivata della mappa di Poincaré in un punto fornisce inoltre informazioni sulla sua stabilità. \textit{Non si è capito in che senso \textquotedblleft la derivata\textquotedblright\ ma deve essere \textquotedblleft minore di $1$ \textquotedblright\ per avere la stabilità. Non si è capito il senso nemmeno di questo.}
+
+\subsection{Mappa logistica}
+\begin{example}
+  Un esempio di biforcazioni e soluzioni periodiche è la \emph{mappa logistica}:
+  \begin{itemize}
+    \item In versione originale $\dot{x} = ax(1-\frac{x}{N})$ dove $N$ è detto \emph{carrying capacity}.
+    \item In versione semplificata $\dot{x} = x(1-x)$.
+    \item Con raccolta costante $\dot{x} = ax(1-x) - h$ ($h$ parametro di biforcazione).
+    \item Con raccolta periodica $\dot{x} = ax(1-x) - h(1+\sin 2\pi t)$.
+  \end{itemize}
+\end{example}
+\end{document}
